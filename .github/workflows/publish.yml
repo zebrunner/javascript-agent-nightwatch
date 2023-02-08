@@ -1,0 +1,24 @@
+name: Publish package to NPM
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: install node v18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: yarn install
+        run: yarn install
+      - name: build
+        run: npm run build
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          access: public
+          token: ${{ secrets.NPM_TOKEN }}
