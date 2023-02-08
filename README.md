@@ -6,42 +6,30 @@ The Nightwatch Agent supports and works with [Mocha](https://nightwatchjs.org/gu
 
 ### Adding dependency
 
-First, you need to add the Zebrunner Agent into your `package.json` file.
+First, you need to add the Zebrunner Agent into your `package.json` file by executing the following command:
 
-=== "NPM"
-
-    ```shell
-    npm install @zebrunner/javascript-agent-nightwatch
-    ```
+```shell
+npm install @zebrunner/javascript-agent-nightwatch
+```
 
 ### Reporter setup
 
 The agent does not work automatically after adding it into the project, it requires extra configuration. For this, you need to perform the following steps:
 
 1. Navigate to your Nightwatch configuration file (by default, it is `nightwatch.conf.js`)
-2. Import the `ZebrunnerReporter` class. Depending on the approach you follow, you need to add either
-
-   ```js
-   const { ZebrunnerReporter } = require('@zebrunner/javascript-agent-nightwatch');
-   ```
-
-   or
-
-   ```js
-   import { ZebrunnerReporter } from '@zebrunner/javascript-agent-nightwatch';
-   ```
-
-3. Since the agent works with Mocha as test runner in Nightwatch, it is necessary to set the `test_runner` config property and set the type to `mocha`. Add `ZebrunnerReporter` as a reporter inside custom Mocha options and provide the reporter configuration (you can find more about that in the next section). Here is an example of a configuration snippet:
+2. Since the agent works with Mocha as test runner in Nightwatch, it is necessary to set the `test_runner` config property and set the type to `mocha`. Make sure that `ui` option reflects correct style used by your tests (`bdd`, `tdd` etc.). 
+3. Add `@zebrunner/javascript-agent-nightwatch` as a reporter inside custom Mocha options and provide the reporter configuration (you can find more about that in the next section). Here is an example of a configuration snippet:
 
    ```js
    module.exports = {
+        // ...
         test_settings: {
             default: {
                 test_runner: {
                     type: 'mocha',
                     options: {
                         ui: 'bdd',
-                        reporter: ZebrunnerReporter,
+                        reporter: "@zebrunner/javascript-agent-nightwatch",
                         reporterOptions: {
                             zebrunnerConfig: {
                             // Zebrunner reporter configuration
@@ -52,6 +40,7 @@ The agent does not work automatically after adding it into the project, it requi
                 // other configs
             },
         },
+        // ...
    };
    ```
 
@@ -93,8 +82,9 @@ The following configuration options allow you to configure accompanying informat
 
 === "Environment Variables"
 
-    The following code snippet is a list of all configuration environment variables from .env file:
-    ```text
+The following code snippet is a list of all configuration environment variables from `.env` file:
+
+   ```text
     REPORTING_ENABLED=true
     REPORTING_PROJECT_KEY=DEF
     REPORTING_SERVER_HOSTNAME=https://mycompany.zebrunner.com
@@ -103,19 +93,20 @@ The following configuration options allow you to configure accompanying informat
     REPORTING_RUN_DISPLAY_NAME=Nightly Regression
     REPORTING_RUN_BUILD=2.41.2.2431-SNAPSHOT
     REPORTING_RUN_ENVIRONMENT=QA
-    ```
+
+   ```
 
 === "`nightwatch.conf.js` file"
 
-    Here you can see an example of the full configuration provided via `nightwatch.conf.js` file:
+Here you can see an example of the full configuration provided via `nightwatch.conf.js` file:
 
-    ```js
+   ```js
     // ...
     test_runner: {
         type: "mocha",
         options: {
             ui: "bdd",
-            reporter: ZebrunnerReporter,
+            reporter: "@zebrunner/javascript-agent-nightwatch",
             reporterOptions: {
                 zebrunnerConfig: {
                     enabled: true,
@@ -134,7 +125,7 @@ The following configuration options allow you to configure accompanying informat
         }
     },
     // ...
-    ```
+   ```
 
 ### Screenshots
 
@@ -142,6 +133,7 @@ In order to view screenshots taken on failed test in Zebrunner, make sure you en
 
    ```js
     module.exports = {
+        // ...
         test_settings: {
             default: {
                 screenshots: {
@@ -156,5 +148,6 @@ In order to view screenshots taken on failed test in Zebrunner, make sure you en
                 // other configs
             },
         },
+        // ...
    };
    ```
