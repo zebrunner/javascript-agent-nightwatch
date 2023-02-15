@@ -1,6 +1,11 @@
 # Zebrunner Nightwatch reporting agent
 
-The Nightwatch Agent supports and works with [Mocha](https://nightwatchjs.org/guide/writing-tests/using-mocha.html) runner so far.
+The Nightwatch Agent supports and works with default Nightwatch and [Mocha](https://nightwatchjs.org/guide/writing-tests/using-mocha.html) runners so far.
+
+Please refer to the appropriate section below to find more information about configuration.
+- [Nightwatch runner](#reporter-setup---nightwatch-runner)
+- [Mocha runner](#reporter-setup---mocha-runner)
+
 
 ## Inclusion into your project
 
@@ -12,7 +17,91 @@ First, you need to add the Zebrunner Agent into your `package.json` file by exec
 npm install @zebrunner/javascript-agent-nightwatch
 ```
 
-### Reporter setup
+### Reporter setup - Nightwatch runner
+
+The agent does not work automatically after adding it into the project, it requires extra configuration. For this, you need to perform the following steps:
+
+1. Navigate to your Nightwatch configuration file (by default, it is `nightwatch.conf.js`)
+2. Create a file with global hooks `lib/globals.js` or open existing one if you already have it and create a reporter inside. Make sure you are referring correctly to `nightwatch.conf.js`
+   ```js
+    const { RealTimeReporter, ReporterAPI } = require('@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter');
+    const config = require('../nightwatch.conf');
+    const zbrReporter = new RealTimeReporter(config);
+   ```
+3. Add or update existing `before` and `after` hooks handlers to start and finish Zebrunner runs as on example below:
+   ```js
+    module.exports = {
+        before: async () => {
+            ReporterAPI.init();
+            await zbrReporter.startTestRun();
+        },
+
+        after: async () => {
+            await zbrReporter.finishTestRun()
+            ReporterAPI.destroy()
+        },
+    };
+   ```
+4. Open `nightwatch.conf.js` and provide the path with hooks for `globals_path` variable and reporter configuration in the top of all settings (you can find more about that in the next section). Here is an example of a configuration snippet:
+
+   ```js
+   module.exports = {
+        src_folders: ["tests"],
+        // path to file with global hooks
+        globals_path: "lib/globals.js",
+        // ...
+        reporterOptions: {
+            zebrunnerConfig: {
+                enabled: true,
+                projectKey: 'DEF',
+                server: {
+                    hostname: 'https://mycompany.zebrunner.com',
+                    accessToken: 'somesecretaccesstoken'
+                },
+                run: {
+                    displayName: "Nightly Regression",
+                    build: '2.41.2.2431-SNAPSHOT',
+                    environment: 'QA',
+                },
+            }
+        }
+        // ...
+   };
+   ```
+5. Update your *all* existing test files with `beforeEach` and `afterEach` hooks handlers to start and finish Zebrunner tests:
+
+- Bdd syntax
+   ```js
+    const { ReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter");
+
+    describe("Test Suite", function () {
+
+        beforeEach((browser) => {
+            ReporterAPI.startTest(browser.currentTest);
+        });
+
+        afterEach((browser) => {
+            ReporterAPI.finishTest(browser.currentTest);
+        });
+    });
+   ```
+- Exports syntax
+   ```js
+    const { ReporterAPI } = require("@zebrunner/javascript-agent-nightwatchlib/nightwatch/realTimeReporter");
+
+    module.exports = {
+
+        beforeEach: function (browser) {
+            ReporterAPI.startTest(browser.currentTest);
+        },
+
+        afterEach: function (browser) {
+            ReporterAPI.finishTest(browser.currentTest);
+        },
+    }
+   ```
+
+### Reporter setup - Mocha runner
 
 The agent does not work automatically after adding it into the project, it requires extra configuration. For this, you need to perform the following steps:
 
@@ -102,32 +191,25 @@ Here you can see an example of the full configuration provided via `nightwatch.c
 
    ```js
     // ...
-    test_runner: {
-        type: "mocha",
-        options: {
-            ui: "bdd",
-            reporter: "@zebrunner/javascript-agent-nightwatch",
-            reporterOptions: {
-                zebrunnerConfig: {
-                    enabled: true,
-                    projectKey: 'DEF',
-                    server: {
-                        hostname: 'https://mycompany.zebrunner.com',
-                        accessToken: 'somesecretaccesstoken'
-                    },
-                    run: {
-                        displayName: "Nightly Regression",
-                        build: '2.41.2.2431-SNAPSHOT',
-                        environment: 'QA',
-                    },
-                }
-            }
+    reporterOptions: {
+        zebrunnerConfig: {
+            enabled: true,
+            projectKey: 'DEF',
+            server: {
+                hostname: 'https://mycompany.zebrunner.com',
+                accessToken: 'somesecretaccesstoken'
+            },
+            run: {
+                displayName: "Nightly Regression",
+                build: '2.41.2.2431-SNAPSHOT',
+                environment: 'QA',
+            },
         }
-    },
+    }
     // ...
    ```
 
-### Screenshots
+## Screenshots
 
 In order to view screenshots taken on failed test in Zebrunner, make sure you enabled them in `nightwatch.conf.js` configuration file:
 
@@ -140,12 +222,8 @@ In order to view screenshots taken on failed test in Zebrunner, make sure you en
                     enabled: true,
                     path: "screens",
                     on_failure: true,
+                    on_error: true,
                 },
-                test_runner: {
-                    type: 'mocha',
-                    // Mocha and Zebrunner configuration
-                },
-                // other configs
             },
         },
         // ...
