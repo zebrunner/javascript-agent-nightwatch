@@ -43,12 +43,12 @@ Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing
         },
 
         beforeEach: (browser, done) => {
-            ReporterAPI.init();
+            ReporterAPI.startSuite(browser);
             done();
         },
 
         afterEach: (browser, done) => {
-            ReporterAPI.destroy();
+            ReporterAPI.finishSuite(browser);
             done();
         },
     };
@@ -103,7 +103,7 @@ Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing
    ```
 - Exports syntax
    ```js
-    const { ReporterAPI } = require("@zebrunner/javascript-agent-nightwatchlib/nightwatch/realTimeReporter");
+    const { ReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter");
 
     module.exports = {
 
