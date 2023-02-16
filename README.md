@@ -21,35 +21,51 @@ npm install @zebrunner/javascript-agent-nightwatch
 
 The agent does not work automatically after adding it into the project, it requires extra configuration. For this, you need to perform the following steps:
 
-1. Navigate to your Nightwatch configuration file (by default, it is `nightwatch.conf.js`)
-2. Create a file with global hooks `lib/globals.js` or open existing one if you already have it and create a reporter inside. Make sure you are referring correctly to `nightwatch.conf.js`
+1. Create a file with global hooks (in this example they are located in `lib/globals.js`) or open existing one if you already have it and configure Zebrunner reporting. 
+Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing-tests/global-test-hooks.html).
+- import `RealTimeReporter`, `ReporterAPI` from `@zebrunner/javascript-agent-nightwatch` package and configuration file of your project (`nightwatch.conf.js` by default).
+- add `before`, `after`, `beforeEach` and `afterEach` hooks handlers (or update if already have it) to start and finish Zebrunner runs.
+
+#### **`globals.js`**
    ```js
     const { RealTimeReporter, ReporterAPI } = require('@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter');
-    const config = require('../nightwatch.conf');
-    const zbrReporter = new RealTimeReporter(config);
-   ```
-3. Add or update existing `before` and `after` hooks handlers to start and finish Zebrunner runs as on example below:
-   ```js
+    const config = require('../nightwatch.conf')
+    let zbrReporter;
+
     module.exports = {
         before: async () => {
-            ReporterAPI.init();
+            zbrReporter = new RealTimeReporter(config);
             await zbrReporter.startTestRun();
         },
 
         after: async () => {
-            await zbrReporter.finishTestRun()
-            ReporterAPI.destroy()
+            await zbrReporter.finishTestRun();
+        },
+
+        beforeEach: (browser, done) => {
+            ReporterAPI.init();
+            done();
+        },
+
+        afterEach: (browser, done) => {
+            ReporterAPI.destroy();
+            done();
         },
     };
    ```
-4. Open `nightwatch.conf.js` and provide the path with hooks for `globals_path` variable and reporter configuration in the top of all settings (you can find more about that in the next section). Here is an example of a configuration snippet:
+2. Navigate to your Nightwatch configuration file (by default, it is `nightwatch.conf.js`) and provide following information:
+- the path with globals hooks for `globals_path` variable (in our case `lib/globals.js`);
+- Zebrunner reporter configuration. You can find more information in the next section [Reporter configuration](#reporter-configuration);
 
+#### **`nightwatch.conf.js`**
    ```js
    module.exports = {
-        src_folders: ["tests"],
-        // path to file with global hooks
-        globals_path: "lib/globals.js",
         // ...
+        src_folders: ["tests"],
+
+        // path to file with Global hooks
+        globals_path: "lib/globals.js", 
+        // Zebrunner reporter configuration
         reporterOptions: {
             zebrunnerConfig: {
                 enabled: true,
@@ -68,7 +84,7 @@ The agent does not work automatically after adding it into the project, it requi
         // ...
    };
    ```
-5. Update your *all* existing test files with `beforeEach` and `afterEach` hooks handlers to start and finish Zebrunner tests:
+3. Update your *ALL* existing test files with `beforeEach` and `afterEach` hooks handlers to start and finish Zebrunner tests:
 
 - Bdd syntax
    ```js
