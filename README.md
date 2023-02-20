@@ -23,18 +23,18 @@ The agent does not work automatically after adding it into the project, it requi
 
 1. Create a file with global hooks (in this example they are located in `lib/globals.js`) or open existing one if you already have it and configure Zebrunner reporting. 
 Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing-tests/global-test-hooks.html).
-- import `RealTimeReporter`, `ReporterAPI` from `@zebrunner/javascript-agent-nightwatch` package and configuration file of your project (`nightwatch.conf.js` by default).
+- import `ZebrunnerReporter`, `ZebrunnerReporterAPI` from `@zebrunner/javascript-agent-nightwatch` package and configuration file of your project (`nightwatch.conf.js` by default).
 - add `before`, `after`, `beforeEach` and `afterEach` hooks handlers (or update if already have it) to start and finish Zebrunner runs.
 
 #### **`globals.js`**
    ```js
-    const { RealTimeReporter, ReporterAPI } = require('@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter');
+    const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter');
     const config = require('../nightwatch.conf')
     let zbrReporter;
 
     module.exports = {
         before: async () => {
-            zbrReporter = new RealTimeReporter(config);
+            zbrReporter = new ZebrunnerReporter(config);
             await zbrReporter.startTestRun();
         },
 
@@ -43,12 +43,12 @@ Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing
         },
 
         beforeEach: (browser, done) => {
-            ReporterAPI.startSuite(browser);
+            ZebrunnerReporterAPI.startTestSession(browser);
             done();
         },
 
         afterEach: (browser, done) => {
-            ReporterAPI.finishSuite(browser);
+            ZebrunnerReporterAPI.finishTestSession(browser);
             done();
         },
     };
@@ -88,31 +88,31 @@ Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing
 
 - Bdd syntax
    ```js
-    const { ReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter");
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter");
 
     describe("Test Suite", function () {
 
         beforeEach((browser) => {
-            ReporterAPI.startTest(browser.currentTest);
+            ZebrunnerReporterAPI.startTest(browser);
         });
 
         afterEach((browser) => {
-            ReporterAPI.finishTest(browser.currentTest);
+            ZebrunnerReporterAPI.finishTest(browser);
         });
     });
    ```
 - Exports syntax
    ```js
-    const { ReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter");
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter");
 
     module.exports = {
 
         beforeEach: function (browser) {
-            ReporterAPI.startTest(browser.currentTest);
+            ZebrunnerReporterAPI.startTest(browser);
         },
 
         afterEach: function (browser) {
-            ReporterAPI.finishTest(browser.currentTest);
+            ZebrunnerReporterAPI.finishTest(browser);
         },
     }
    ```
@@ -125,6 +125,7 @@ The agent does not work automatically after adding it into the project, it requi
 2. Since the agent works with Mocha as test runner in Nightwatch, it is necessary to set the `test_runner` config property and set the type to `mocha`. Make sure that `ui` option reflects correct style used by your tests (`bdd`, `tdd` etc.). 
 3. Add `@zebrunner/javascript-agent-nightwatch` as a reporter inside custom Mocha options and provide the reporter configuration (you can find more about that in the next section). Here is an example of a configuration snippet:
 
+#### **`nightwatch.conf.js`**
    ```js
    module.exports = {
         // ...
@@ -225,10 +226,31 @@ Here you can see an example of the full configuration provided via `nightwatch.c
     // ...
    ```
 
+## Executing tests using external testing platforms
+
+While executing tests using external testing platforms (Browser Stack, Sauce Labs etc.), it is necessary to define one more Zebrunner capability `zebrunner:provider` in order to track test sessions and their artifacts (such as video) correctly.
+Possible values:  "ZEBRUNNER" | "BROWSERSTACK" | "LAMBDATEST" | "SAUCELABS" | "TESTINGBOT".
+
+#### **`nightwatch.conf.js`**
+   ```js
+    module.exports = {
+        // ...
+        desiredCapabilities: {
+            browserName: "chrome",
+            "goog:chromeOptions": {
+                w3c: true,
+            },
+            "zebrunner:provider": "BROWSERSTACK"
+        },
+        // ...
+   };
+   ```
+
 ## Screenshots
 
 In order to view screenshots taken on failed test in Zebrunner, make sure you enabled them in `nightwatch.conf.js` configuration file:
 
+#### **`nightwatch.conf.js`**
    ```js
     module.exports = {
         // ...
