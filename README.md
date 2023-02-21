@@ -84,7 +84,52 @@ Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing
         // ...
    };
    ```
-3. Update your *ALL* existing test files with `beforeEach` and `afterEach` hooks handlers to start and finish Zebrunner tests:
+3. Update your *ALL* existing test files with one of the approach below depends on your needs.
+
+NOTE: you can use only one approach within a test file, but different test files from one execution (test run) can use any of those options.
+
+a. if you wish to track *all tests from the file as one test in Zebrunner*, use `before` and `after` hooks handlers to start and finish Zebrunner test as on examples below. You can define the second argument (`Your test name` in this case), if you want to see a custom name of the test. In case of absence, the agent will use test file name.
+
+- Bdd syntax
+   ```js
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter");
+
+    describe("Test Suite", function () {
+
+        before((browser) => {
+            ZebrunnerReporterAPI.startTest(browser, "Your test name");
+            // or just
+            // ZebrunnerReporterAPI.startTest(browser);
+        });
+
+        after((browser) => {
+            ZebrunnerReporterAPI.finishTest(browser, "Your test name");
+            // or just
+            // ZebrunnerReporterAPI.finishTest(browser);
+        });
+    });
+   ```
+- Exports syntax
+   ```js
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter");
+
+    module.exports = {
+
+        before: function (browser) {
+            ZebrunnerReporterAPI.startTest(browser, "Your test name");
+            // or just
+            // ZebrunnerReporterAPI.startTest(browser);
+        },
+
+        after: function (browser) {
+            ZebrunnerReporterAPI.finishTest(browser, "Your test name");
+            // or just
+            // ZebrunnerReporterAPI.finishTest(browser);
+        },
+    }
+   ```
+
+b. if you wish to track tests in classic manner i.e. *each test from the file as one test in Zebrunner*, use `beforeEach` and `afterEach` hooks handlers. The second optional argument will be used as prefix of all reported Zebrunner tests. Otherwise, the agent will use test file name.
 
 - Bdd syntax
    ```js
@@ -93,11 +138,15 @@ Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing
     describe("Test Suite", function () {
 
         beforeEach((browser) => {
-            ZebrunnerReporterAPI.startTest(browser);
+            ZebrunnerReporterAPI.startTest(browser, "Your test name that will be used as prefix");
+            // or just
+            // ZebrunnerReporterAPI.startTest(browser);
         });
 
         afterEach((browser) => {
-            ZebrunnerReporterAPI.finishTest(browser);
+            ZebrunnerReporterAPI.finishTest(browser, "Your test name that will be used as prefix");
+            // or just
+            // ZebrunnerReporterAPI.finishTest(browser);
         });
     });
    ```
@@ -108,11 +157,15 @@ Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing
     module.exports = {
 
         beforeEach: function (browser) {
-            ZebrunnerReporterAPI.startTest(browser);
+            ZebrunnerReporterAPI.startTest(browser, "Your test name that will be used as prefix");
+            // or just
+            // ZebrunnerReporterAPI.startTest(browser);
         },
 
         afterEach: function (browser) {
-            ZebrunnerReporterAPI.finishTest(browser);
+            ZebrunnerReporterAPI.finishTest(browser, "Your test name that will be used as prefix");
+            // or just
+            // ZebrunnerReporterAPI.finishTest(browser);
         },
     }
    ```
