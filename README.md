@@ -129,7 +129,7 @@ a. if you wish to track *all tests from the file as one test in Zebrunner*, use 
     }
    ```
 
-b. if you wish to track tests in classic manner i.e. *each test from the file as one test in Zebrunner*, use `beforeEach` and `afterEach` hooks handlers. The second optional argument will be used as prefix of all reported Zebrunner tests. Otherwise, the agent will use test file name.
+b. if you wish to track tests in classic manner i.e. *each test from the file as separate test in Zebrunner*, use `beforeEach` and `afterEach` hooks handlers. The second optional argument will be used as prefix of all reported Zebrunner tests. Otherwise, the agent will use running test file name.
 
 - Bdd syntax
    ```js
@@ -168,6 +168,39 @@ b. if you wish to track tests in classic manner i.e. *each test from the file as
             // ZebrunnerReporterAPI.finishTest(browser);
         },
     }
+   ```
+c. if you want to track *all tests from the file as one test in Zebrunner* for all your files in the framework, use `beforeEach` and `afterEach` hooks handlers from `lib/globals.js`. In this case, configuration is mandatory only for this file with global hooks and *not* necessary to update each test file. 
+
+NOTE: using this configuration, logs and screenshots of the test will be displayed in Zebrunner when a whole test file is finished.
+
+#### **`globals.js`**
+   ```js
+    const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('@zebrunner/javascript-agent-nightwatch/lib/nightwatch/realTimeReporter');
+    const config = require('../nightwatch.conf')
+    let zbrReporter;
+
+    module.exports = {
+        before: async () => {
+            zbrReporter = new ZebrunnerReporter(config);
+            await zbrReporter.startTestRun();
+        },
+
+        after: async () => {
+            await zbrReporter.finishTestRun();
+        },
+
+        beforeEach: (browser, done) => {
+            ZebrunnerReporterAPI.startTestSession(browser);
+            ZebrunnerReporterAPI.startTest(browser);
+            done();
+        },
+
+        afterEach: (browser, done) => {
+            ZebrunnerReporterAPI.finishTest(browser);
+            ZebrunnerReporterAPI.finishTestSession(browser);
+            done();
+        },
+    };
    ```
 
 ### Reporter setup - Mocha runner
