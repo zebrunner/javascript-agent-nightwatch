@@ -270,6 +270,26 @@ The following configuration options allow you to configure accompanying informat
 | `REPORTING_RUN_BUILD`<br/>`run.build`              | Build number associated with the launch. It can reflect either the test build number or the build number of the application under test. |
 | `REPORTING_RUN_ENVIRONMENT`<br/>`run.environment`  | Represents the target environment in which the tests were run. For example, `stage` or `prod`.                                          |
 
+#### Milestone
+
+Zebrunner Milestone for the automation launch can be configured using the following configuration options (all of them are optional).
+
+| Env var / Reporter config                       | Description                                                                                                                                                                                                                         |
+|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_MILESTONE_ID`<br/>`milestone.id`     | Id of the Zebrunner Milestone to link the automation launch to. The id is not displayed on Zebrunner UI, so the field is basically used for internal purposes. If the milestone does not exist, the launch will continue executing. |
+| `REPORTING_MILESTONE_NAME`<br/>`milestone.name` | Name of the Zebrunner Milestone to link the automation launch to. If the milestone does not exist, the appropriate warning message will be displayed in logs, but the test suite will continue executing.                           |
+
+#### Notifications
+
+Zebrunner provides notification capabilities for automation launch results. The following options configure notification rules and targets.
+
+| Env var / Reporter config                                                               | Description                                                                                                                                                                                                                                                                                                                                                              |
+|-----------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_NOTIFICATION_NOTIFY_ON_EACH_FAILURE`<br/>`notifications.notifyOnEachFailure` | Specifies whether Zebrunner should send notifications to Slack/Teams on each test failure. The notifications will be sent even if the launch is still running. The default value is `false`.                                                                                                                                                                             |
+| `REPORTING_NOTIFICATION_SLACK_CHANNELS`<br/>`notifications.slackChannels`               | A comma-separated list of Slack channels to send notifications to. Notifications will be sent only if the Slack integration is properly configured in Zebrunner with valid credentials for the project the launch is reported to. Zebrunner can send two types of notifications: on each test failure (if the appropriate property is enabled) and on the launch finish. |
+| `REPORTING_NOTIFICATION_MS_TEAMS_CHANNELS`<br/>`notifications.teamsChannels`            | A comma-separated list of Microsoft Teams channels to send notifications to. Notifications will be sent only if the Teams integration is configured in the Zebrunner project with valid webhooks for the channels. Zebrunner can send two types of notifications: on each test failure (if the appropriate property is enabled) and on the launch finish.                |
+| `REPORTING_NOTIFICATION_EMAILS`<br/>`notifications.emails`                              | A comma-separated list of emails to send notifications to. This type of notifications does not require further configuration on Zebrunner side. Unlike other notification mechanisms, Zebrunner can send emails only on the launch finish.                                                                                                                               |
+
 ### Examples
 
 === "Environment Variables"
@@ -285,6 +305,14 @@ The following code snippet is a list of all configuration environment variables 
     REPORTING_RUN_DISPLAY_NAME=Nightly Regression
     REPORTING_RUN_BUILD=2.41.2.2431-SNAPSHOT
     REPORTING_RUN_ENVIRONMENT=QA
+
+    REPORTING_MILESTONE_ID=1
+    REPORTING_MILESTONE_NAME=Release 1.0.0
+
+    REPORTING_NOTIFICATION_NOTIFY_ON_EACH_FAILURE=false
+    REPORTING_NOTIFICATION_SLACK_CHANNELS=dev, qa
+    REPORTING_NOTIFICATION_MS_TEAMS_CHANNELS=dev-channel, management
+    REPORTING_NOTIFICATION_EMAILS=manager@mycompany.com
 
    ```
 
@@ -306,6 +334,16 @@ Here you can see an example of the full configuration provided via `nightwatch.c
                 displayName: "Nightly Regression",
                 build: '2.41.2.2431-SNAPSHOT',
                 environment: 'QA',
+            },
+            milestone: {
+                id: 1,
+                name: 'Release 1.0.0',
+            },
+            notifications: {
+                notifyOnEachFailure: false,
+                slackChannels: 'dev, qa',
+                teamsChannels: 'dev-channel, management',
+                emails: 'manager@mycompany.com',
             },
         }
     }
