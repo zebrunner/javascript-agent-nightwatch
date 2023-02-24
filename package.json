@@ -7,7 +7,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "npm install && npx nightwatch tests/specs/ --config tests/nightwatch.conf.js"
+    "test": "npx nightwatch tests/specs/ --config tests/nightwatch.conf.js"
   },
   "repository": {
     "type": "git",

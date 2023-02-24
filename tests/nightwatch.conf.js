@@ -1,3 +1,5 @@
+const { ZebrunnerConfigurator } = require('../lib/index');
+
 module.exports = {
   src_folders: ['specs'],
   page_objects_path: [],
@@ -18,7 +20,7 @@ module.exports = {
   reporterOptions: {
     zebrunnerConfig: {
       enabled: true,
-      projectKey: 'ANNAS',
+      projectKey: 'DEF',
       server: {
         hostname: 'https://solvdinternal.zebrunner.com/',
         accessToken: 'CAve1wEDfcbfWuhMdtoPHAaDdaMCOyaUUR7ykFRvi7YwipX6Ee',
@@ -36,7 +38,7 @@ module.exports = {
         notifyOnEachFailure: false,
         slackChannels: 'dev, qa',
         teamsChannels: 'dev-channel, management',
-        emails: 'asukhodolova@solvd.com',
+        // emails: 'asukhodolova@solvd.com',
       },
     },
   },
@@ -67,25 +69,20 @@ module.exports = {
       },
     },
 
-    remote: {
+    zebrunner: ZebrunnerConfigurator.configureLauncher({
       selenium: {
         start_process: false,
         server_path: '',
-        host: 'engine.zebrunner.com',
-        port: 443,
+        host: 'localhost',
+        port: 4444,
       },
 
-      username: 'solvdinternal',
-      access_key: 'O9JjPcqxJ0hPs685',
+      username: 'username',
+      access_key: 'access_key',
 
       webdriver: {
-        keep_alive: true,
         start_process: false,
       },
-    },
-
-    'remote.chrome': {
-      extends: 'remote',
       desiredCapabilities: {
         browserName: 'chrome',
         'goog:chromeOptions': {
@@ -93,7 +90,7 @@ module.exports = {
         },
         'zebrunner:provider': 'ZEBRUNNER',
       },
-    },
+    }),
 
     mocha_tests: {
       test_runner: {

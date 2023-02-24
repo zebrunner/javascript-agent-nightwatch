@@ -1,5 +1,5 @@
 /* eslint-disable func-names */
-const { ZebrunnerReporterAPI } = require('../../lib/nightwatch/realTimeReporter');
+const { ZebrunnerReporterAPI } = require('../../lib/index');
 
 module.exports = {
 
