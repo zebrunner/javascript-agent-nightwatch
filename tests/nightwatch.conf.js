@@ -75,8 +75,8 @@ module.exports = {
         port: 443,
       },
 
-      username: 'username',
-      access_key: 'access_key',
+      username: 'solvdinternal',
+      access_key: 'O9JjPcqxJ0hPs685',
 
       webdriver: {
         keep_alive: true,
