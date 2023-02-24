@@ -1,13 +1,13 @@
 {
   "name": "@zebrunner/javascript-agent-nightwatch",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Zebrunner Agent: Nightwatch reporting integration",
   "main": "index.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx nightwatch tests/specs/ --config tests/nightwatch.conf.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/zebrunner/javascript-agent-nightwatch#readme",
   "devDependencies": {
+    "chromedriver": "^110.0.0",
     "eslint": "^8.32.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.27.5",
