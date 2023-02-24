@@ -1,4 +1,3 @@
-/* eslint-disable func-names */
 const { ZebrunnerReporterAPI } = require('../../lib/index');
 
 module.exports = {
@@ -15,7 +14,7 @@ module.exports = {
     browser.end();
   },
 
-  'step one: navigate to ecosia.org': function (browser) {
+  'step one: navigate to ecosia.org': (browser) => {
     browser
       .url('https://www.ecosia.org')
       .waitForElementVisible('body')
@@ -25,7 +24,7 @@ module.exports = {
       .assert.visible('button[type=submit]');
   },
 
-  'step two: click submit': function (browser) {
+  'step two: click submit': (browser) => {
     browser
       .click('button[type=submit]')
       .assert.textContains('.layout__content', 'Nightwatch.js');

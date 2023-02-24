@@ -15,6 +15,7 @@ module.exports = {
     workers: 'auto',
   },
 
+  live_output: true,
   parallel_process_delay: 3000,
 
   reporterOptions: {
