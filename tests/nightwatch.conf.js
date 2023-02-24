@@ -20,7 +20,7 @@ module.exports = {
   reporterOptions: {
     zebrunnerConfig: {
       enabled: true,
-      projectKey: 'DEF',
+      projectKey: 'ANNAS',
       server: {
         hostname: 'https://solvdinternal.zebrunner.com/',
         accessToken: 'CAve1wEDfcbfWuhMdtoPHAaDdaMCOyaUUR7ykFRvi7YwipX6Ee',
