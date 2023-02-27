@@ -28,7 +28,7 @@ Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing
 
 #### **`globals.js`**
    ```js
-    const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('@zebrunner/javascript-agent-nightwatch/lib/index');
+    const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('@zebrunner/javascript-agent-nightwatch');
     const config = require('../nightwatch.conf')
     let zbrReporter;
 
@@ -79,6 +79,16 @@ Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing
                     build: '2.41.2.2431-SNAPSHOT',
                     environment: 'QA',
                 },
+                milestone: {
+                    id: 1,
+                    name: 'Release 1.0.0',
+                },
+                notifications: {
+                    notifyOnEachFailure: false,
+                    slackChannels: 'dev, qa',
+                    teamsChannels: 'dev-channel, management',
+                    emails: 'manager@mycompany.com',
+                },
             }
         }
         // ...
@@ -92,7 +102,7 @@ a. if you wish to track *all tests from the file as one test in Zebrunner*, use 
 
 - Bdd syntax
    ```js
-    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/index");
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch");
 
     describe("Test Suite", function () {
 
@@ -111,7 +121,7 @@ a. if you wish to track *all tests from the file as one test in Zebrunner*, use 
    ```
 - Exports syntax
    ```js
-    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/index");
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch");
 
     module.exports = {
 
@@ -133,7 +143,7 @@ b. if you wish to track tests in classic manner i.e. *each test from the file as
 
 - Bdd syntax
    ```js
-    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/index");
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch");
 
     describe("Test Suite", function () {
 
@@ -152,7 +162,7 @@ b. if you wish to track tests in classic manner i.e. *each test from the file as
    ```
 - Exports syntax
    ```js
-    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/index");
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch");
 
     module.exports = {
 
@@ -175,7 +185,7 @@ NOTE: using this configuration, logs and screenshots of the test will be display
 
 #### **`globals.js`**
    ```js
-    const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('@zebrunner/javascript-agent-nightwatch/lib/index');
+    const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('@zebrunner/javascript-agent-nightwatch');
     const config = require('../nightwatch.conf')
     let zbrReporter;
 
@@ -356,18 +366,21 @@ The Nightwatch Agent is fully integrated with the Zebrunner Launcher and require
 ### Testing Platform and capabilities
 Moreover, the Zebrunner Agent will automatically substitute the Selenium server and capabilities configurations with the values selected in Testing Platform section in Zebrunner Launcher. For example, if you select Zebrunner Selenium Grid as a testing platform and select the Linux platform and the Chrome 105.0 browser, the Zebrunner Agent will apply the following configuration on your `nightwatch.conf.js` file. 
 
-Only necessary to import `ZebrunnerConfigurator` and add a new environment that calls `ZebrunnerConfigurator.configureLauncher` function with basic config object of the following structure (in this section below) into `nightwatch.conf.js` configuration file. 
+Only necessary to import `ZebrunnerConfigurator` and add a new environment that calls `ZebrunnerConfigurator.configureLauncher` function with basic config object of the following structure (please see below) into `nightwatch.conf.js` configuration file. 
 Learn more about [Nightwatch environments](https://nightwatchjs.org/guide/configuration/define-test-environments.html).
 
-When configuration below is added, you will be able to execute the tests against this environment using the command `npx nightwatch --env zebrunner`.
-NOTE: this environment can be used in 2 ways:
-- using Zebrunner Launcher: in this case Zebrunner Agent will automatically substitute the Selenium server and capabilities;
-- locally but using Zebrunner Selenium Grid: in this case you should provide valid Selenium information for host, port, username and access_key fields.
+When configuration below is added, you will be able to execute the tests against this environment using the command `npx nightwatch tests/ --env zebrunner` or `npm run test -- --env zebrunner` - depends on your `package.json` scripts section configuration.
+
+*NOTE*: this environment can be used in 2 ways:
+- using Zebrunner Launcher: in this case Zebrunner Agent will automatically substitute the Selenium server and capabilities according to provided information on Launchers page:
+![Example of launcher configuration](./images/launcher_config.png).
+
+- start running the tests locally, but using remote browsers with Zebrunner Selenium Grid: in this case you should provide valid Selenium information for host, port, username and access_key fields.
 
 
 #### **`nightwatch.conf.js`**
    ```js
-    const { ZebrunnerConfigurator } = require('@zebrunner/javascript-agent-nightwatch/lib/index');
+    const { ZebrunnerConfigurator } = require('@zebrunner/javascript-agent-nightwatch');
 
     module.exports = {
 
@@ -382,6 +395,7 @@ NOTE: this environment can be used in 2 ways:
                 },
             },
 
+            // `zebrunner` environment should be defined on the same level as `default` environment
             zebrunner: ZebrunnerConfigurator.configureLauncher({
                 selenium: {
                     start_process: false,
