@@ -1,4 +1,4 @@
-const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('../lib/index');
+const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('..');
 const config = require('./nightwatch.conf');
 
 let zbrReporter;

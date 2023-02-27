@@ -1,4 +1,4 @@
-const { ZebrunnerConfigurator } = require('../lib/index');
+const { ZebrunnerConfigurator } = require('..');
 
 module.exports = {
   src_folders: ['specs'],

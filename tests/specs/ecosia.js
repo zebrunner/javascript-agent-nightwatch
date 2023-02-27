@@ -1,4 +1,4 @@
-const { ZebrunnerReporterAPI } = require('../../lib/index');
+const { ZebrunnerReporterAPI } = require('../..');
 
 module.exports = {
 
