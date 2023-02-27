@@ -28,7 +28,7 @@ Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing
 
 #### **`globals.js`**
    ```js
-    const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('@zebrunner/javascript-agent-nightwatch/lib/index');
+    const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('@zebrunner/javascript-agent-nightwatch');
     const config = require('../nightwatch.conf')
     let zbrReporter;
 
@@ -92,7 +92,7 @@ a. if you wish to track *all tests from the file as one test in Zebrunner*, use 
 
 - Bdd syntax
    ```js
-    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/index");
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch");
 
     describe("Test Suite", function () {
 
@@ -111,7 +111,7 @@ a. if you wish to track *all tests from the file as one test in Zebrunner*, use 
    ```
 - Exports syntax
    ```js
-    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/index");
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch");
 
     module.exports = {
 
@@ -133,7 +133,7 @@ b. if you wish to track tests in classic manner i.e. *each test from the file as
 
 - Bdd syntax
    ```js
-    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/index");
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch");
 
     describe("Test Suite", function () {
 
@@ -152,7 +152,7 @@ b. if you wish to track tests in classic manner i.e. *each test from the file as
    ```
 - Exports syntax
    ```js
-    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch/lib/index");
+    const { ZebrunnerReporterAPI } = require("@zebrunner/javascript-agent-nightwatch");
 
     module.exports = {
 
@@ -175,7 +175,7 @@ NOTE: using this configuration, logs and screenshots of the test will be display
 
 #### **`globals.js`**
    ```js
-    const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('@zebrunner/javascript-agent-nightwatch/lib/index');
+    const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('@zebrunner/javascript-agent-nightwatch');
     const config = require('../nightwatch.conf')
     let zbrReporter;
 
@@ -367,7 +367,7 @@ NOTE: this environment can be used in 2 ways:
 
 #### **`nightwatch.conf.js`**
    ```js
-    const { ZebrunnerConfigurator } = require('@zebrunner/javascript-agent-nightwatch/lib/index');
+    const { ZebrunnerConfigurator } = require('@zebrunner/javascript-agent-nightwatch');
 
     module.exports = {
 
