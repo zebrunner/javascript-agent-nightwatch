@@ -1,8 +1,10 @@
-const { ZebrunnerReporterAPI } = require('../..');
+const { ZebrunnerReporterAPI, CurrentTestRun, CurrentTest } = require('../..');
 
 module.exports = {
 
   beforeEach(browser) {
+    CurrentTestRun.attachLabel('launch_key', 'hello!!!', 'one more', '', null);
+    CurrentTestRun.attachArtifactReference('documentation', 'https://zebrunner.com/documentation/');
     ZebrunnerReporterAPI.startTest(browser);
   },
 
@@ -15,6 +17,9 @@ module.exports = {
   },
 
   'step one: navigate to ecosia.org': (browser) => {
+    CurrentTest.attachLabel(browser, 'test_key', 'test_value');
+    CurrentTest.attachArtifactReference(browser, 'github', 'https://github.com/zebrunner');
+
     browser
       .url('https://www.ecosia.org')
       .waitForElementVisible('body')
