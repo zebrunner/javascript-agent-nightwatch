@@ -78,6 +78,14 @@ Read more about [Nightwatch global hooks](https://nightwatchjs.org/guide/writing
                     displayName: "Nightly Regression",
                     build: '2.41.2.2431-SNAPSHOT',
                     environment: 'QA',
+                    locale: 'en_US',
+                    labels: {
+                        runner: 'Alice',
+                        reviewer: 'Bob',
+                    },
+                    artifactReferences: {
+                        landing: 'https://zebrunner.com',
+                    },
                 },
                 milestone: {
                     id: 1,
@@ -136,7 +144,7 @@ a. if you wish to track *all tests from the file as one test in Zebrunner*, use 
             // or just
             // ZebrunnerReporterAPI.finishTest(browser);
         },
-    }
+    };
    ```
 
 b. if you wish to track tests in classic manner i.e. *each test from the file as separate test in Zebrunner*, use `beforeEach` and `afterEach` hooks handlers. The second optional argument will be used as prefix of all reported Zebrunner tests. Otherwise, the agent will use running test file name.
@@ -177,7 +185,7 @@ b. if you wish to track tests in classic manner i.e. *each test from the file as
             // or just
             // ZebrunnerReporterAPI.finishTest(browser);
         },
-    }
+    };
    ```
 c. if you want to track *all tests from the file as one test in Zebrunner* for all your files in the framework, use `beforeEach` and `afterEach` hooks handlers from `lib/globals.js`. In this case, configuration is mandatory only for this file with global hooks and *not* necessary to update each test file. 
 
@@ -277,8 +285,11 @@ The following configuration options allow you to configure accompanying informat
 | Env var / Reporter config                          | Description                                                                                                                             |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `REPORTING_RUN_DISPLAY_NAME`<br/>`run.displayName` | Display name of the launch in Zebrunner. The default value is `Default Suite`.                                                          |
-| `REPORTING_RUN_BUILD`<br/>`run.build`              | Build number associated with the launch. It can reflect either the test build number or the build number of the application under test. |
-| `REPORTING_RUN_ENVIRONMENT`<br/>`run.environment`  | Represents the target environment in which the tests were run. For example, `stage` or `prod`.                                          |
+| `REPORTING_RUN_BUILD`<br/>`run.build` | Build number associated with the launch. It can reflect either the test build number or the build number of the application under test. |
+| `REPORTING_RUN_ENVIRONMENT`<br/>`run.environment` | Represents the target environment in which the tests were run. For example, `stage` or `prod`. |
+| `REPORTING_LAUNCH_LOCALE`<br/>`launch.locale` | Locale that will be displayed for the automation launch in Zebrunner. For example,`en_US`. |
+| `<N/A>`<br/>`launch.labels` | Object with labels to be attached to the current launch. Property name is the label key, property value is the label value. Label value must be a string. |
+| `<N/A>`<br/>`launch.artifactReferences` | Object with artifact references to be attached to the current launch. Property name is the artifact reference name, property value is the artifact reference value. Value must be a string. |
 
 #### Milestone
 
@@ -315,6 +326,7 @@ The following code snippet is a list of all configuration environment variables 
     REPORTING_RUN_DISPLAY_NAME=Nightly Regression
     REPORTING_RUN_BUILD=2.41.2.2431-SNAPSHOT
     REPORTING_RUN_ENVIRONMENT=QA
+    REPORTING_RUN_LOCALE=en_US
 
     REPORTING_MILESTONE_ID=1
     REPORTING_MILESTONE_NAME=Release 1.0.0
@@ -344,6 +356,14 @@ Here you can see an example of the full configuration provided via `nightwatch.c
                 displayName: "Nightly Regression",
                 build: '2.41.2.2431-SNAPSHOT',
                 environment: 'QA',
+                locale: 'en_US',
+                labels: {
+                    runner: 'Alice',
+                    reviewer: 'Bob',
+                },
+                artifactReferences: {
+                    landing: 'https://zebrunner.com',
+                },
             },
             milestone: {
                 id: 1,
@@ -464,3 +484,133 @@ In order to view screenshots taken on failed test in Zebrunner, make sure you en
         // ...
    };
    ```
+
+## Tracking test maintainer
+
+You may want to add transparency to the process of automation maintenance by having an engineer responsible for evolution of specific tests or test suites. To serve that purpose, Zebrunner comes with a concept of a maintainer.
+
+In order to keep track of those, the Agent comes with the `#setMaintainer()` method of the `CurrentTest` object. This method accepts the username of an existing Zebrunner user. If there is no user with the given username, `anonymous` will be assigned.
+
+```js
+    const { CurrentTest } = require("@zebrunner/javascript-agent-nightwatch");
+
+    module.exports = {
+
+        beforeEach(browser) {
+            ZebrunnerReporterAPI.startTest(browser);
+
+            CurrentTest.setMaintainer(browser, 'developer'); // will be set for all tests from the file
+        },
+
+        afterEach(browser) {
+            ZebrunnerReporterAPI.finishTest(browser);
+        },
+
+        'first test': (browser) => {
+            CurrentTest.setMaintainer(browser, 'tester'); // will be set only for this test
+            // ...
+        },
+
+        'second test': (browser) => {
+            // ...
+        },
+    };
+```
+
+In this example, `developer` will be reported as a maintainer of `second test` (because the value is set in `beforeEach()`), while `tester` will be reported as a maintainer of the `first test` (overrides value set in `beforeEach()`).
+
+## Attaching labels to test and test run
+
+In some cases, it may be useful to attach meta information related to a test or the entire run.
+
+The agent comes with a concept of labels. Label is a simple key-value pair. The label key is represented by a string, the label value accepts a vararg of strings.
+
+To attach a label to a test, you need to invoke the `#attachLabel()` method of the `CurrentTest` object in scope of the test method. To attach label to the entire run, you can either invoke the `attachLabel` method of the `CurrentTestRun` object or provide the labels in [`nightwatch.conf.js` file](#automation-launch-configuration).
+
+
+```js
+    const { CurrentTestRun, CurrentTest } = require("@zebrunner/javascript-agent-nightwatch");
+
+    module.exports = {
+
+        beforeEach(browser) {
+            CurrentTestRun.attachLabel('run_label', 'first', 'second');
+
+            ZebrunnerReporterAPI.startTest(browser);
+
+            CurrentTest.attachLabel(browser, 'test_label', 'before_1', 'before_2');
+        },
+
+        afterEach(browser) {
+            ZebrunnerReporterAPI.finishTest(browser);
+        },
+
+        'first test': (browser) => {
+            CurrentTestRun.attachLabel('feature', 'smoke');
+
+            CurrentTest.attachLabel(browser, 'test', 'pass');
+            CurrentTest.attachLabel(browser, 'owner', 'developer');
+            // ...
+        },
+    };
+```
+
+## Attaching artifact references to test and test run
+
+Labels are not the only option for attaching meta information to test and launch. If the information you want to attach is a link (to a file or webpage), it is more useful to attach it as an artifact reference (or to put it simply as a link).
+
+The `#attachArtifactReference()` methods of the `CurrentTest` and `CurrentTestRun` objects serve exactly this purpose. These methods accept two arguments. The first one is the artifact reference name which will be shown in Zebrunner. The second one is the artifact reference value.
+
+Also, you can attach artifact references to the entire launch by specifying them in [`nightwatch.conf.js` file](#automation-launch-configuration).
+
+```js
+    const { CurrentTestRun, CurrentTest } = require("@zebrunner/javascript-agent-nightwatch");
+
+    module.exports = {
+
+        beforeEach(browser) {
+            CurrentTestRun.attachArtifactReference('documentation', 'https://zebrunner.com/documentation/');
+
+            ZebrunnerReporterAPI.startTest(browser);
+        },
+
+        afterEach(browser) {
+            ZebrunnerReporterAPI.finishTest(browser);
+        },
+
+        'first test': (browser) => {
+            CurrentTest.attachArtifactReference(browser, 'github', 'https://github.com/zebrunner');
+            // ...
+        },
+    };
+```
+
+## Reverting test registration
+
+In some cases, it might be handy not to register test executions in Zebrunner. This may be caused by very special circumstances of a test environment or execution conditions.
+
+Zebrunner Agent comes with a convenient method `#revertRegistration()` of the `CurrentTest` object for reverting test registration at runtime. The following code snippet shows a case where test is not reported on Monday.
+
+```js
+    const { CurrentTest } = require("@zebrunner/javascript-agent-nightwatch");
+
+    module.exports = {
+
+        beforeEach(browser) {
+            ZebrunnerReporterAPI.startTest(browser);
+        },
+
+        afterEach(browser) {
+            ZebrunnerReporterAPI.finishTest(browser);
+        },
+
+        'first test': (browser) => {
+            if (new Date().getDay() === 1) {
+                CurrentTest.revertRegistration(browser);
+            }
+            // ...
+        },
+    };
+```
+
+It is worth mentioning that the method invocation does not affect the test execution, but simply unregisters the test in Zebrunner. To interrupt the test execution, you need to do additional actions, for example, throw an Error.
