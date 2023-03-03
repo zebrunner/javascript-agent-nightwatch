@@ -525,7 +525,8 @@ In some cases, it may be useful to attach meta information related to a test or 
 
 The agent comes with a concept of labels. Label is a simple key-value pair. The label key is represented by a string, the label value accepts a vararg of strings.
 
-To attach a label to a test, you need to invoke the `#attachLabel()` method of the `CurrentTest` object in scope of the test method. To attach label to the entire run, you can either invoke the `attachLabel` method of the `CurrentTestRun` object or provide the labels in [`nightwatch.conf.js` file](#automation-launch-configuration).
+To attach a label to a test, you need to invoke the `#attachLabel()` method of the `CurrentTest` object in scope of the test method. Also you can use this method in `beforeEach()` that means such labels will be assigned for all test cases from the file.
+To attach label to the entire run, you can either invoke the `attachLabel` method of the `CurrentTestRun` object or provide the labels in [`nightwatch.conf.js` file](#automation-launch-configuration).
 
 
 ```js
@@ -557,11 +558,12 @@ To attach a label to a test, you need to invoke the `#attachLabel()` method of t
 
 ## Attaching artifact references to test and test run
 
-Labels are not the only option for attaching meta information to test and launch. If the information you want to attach is a link (to a file or webpage), it is more useful to attach it as an artifact reference (or to put it simply as a link).
+Labels are not the only option for attaching meta information to test and test run. If the information you want to attach is a link (to a file or webpage), it is more useful to attach it as an artifact reference (or to put it simply as a link).
 
 The `#attachArtifactReference()` methods of the `CurrentTest` and `CurrentTestRun` objects serve exactly this purpose. These methods accept two arguments. The first one is the artifact reference name which will be shown in Zebrunner. The second one is the artifact reference value.
+Also you can use `CurrentTest.attachArtifactReference()` in `beforeEach()` hook that means a reference will be assigned for all test cases from the file.
 
-Also, you can attach artifact references to the entire launch by specifying them in [`nightwatch.conf.js` file](#automation-launch-configuration).
+Moreover, you can attach artifact references to the entire test run by specifying them in [`nightwatch.conf.js` file](#automation-launch-configuration).
 
 ```js
     const { CurrentTestRun, CurrentTest } = require("@zebrunner/javascript-agent-nightwatch");
@@ -572,6 +574,7 @@ Also, you can attach artifact references to the entire launch by specifying them
             CurrentTestRun.attachArtifactReference('documentation', 'https://zebrunner.com/documentation/');
 
             ZebrunnerReporterAPI.startTest(browser);
+            CurrentTest.attachArtifactReference(browser, 'github', 'https://github.com/zebrunner');
         },
 
         afterEach(browser) {
@@ -579,7 +582,42 @@ Also, you can attach artifact references to the entire launch by specifying them
         },
 
         'first test': (browser) => {
-            CurrentTest.attachArtifactReference(browser, 'github', 'https://github.com/zebrunner');
+            CurrentTest.attachArtifactReference(browser, 'nightwatch', 'https://nightwatchjs.org/');
+            // ...
+        },
+    };
+```
+
+## Attaching artifacts to test and test run
+
+In case your tests or entire test run produce some artifacts, it may be useful to track them in Zebrunner. The agent comes with a few convenient methods for uploading artifacts in Zebrunner and linking them to the currently running test or the test run.
+
+The `#uploadArtifactBuffer()` and `#uploadArtifactFromFile()` methods of the `CurrentTest` and `CurrentTestRun` objects serve exactly this purpose. 
+Also you can use methods mentioned above from `CurrentTest` in `beforeEach()` hook that means an artifact will be assigned for all test cases from the file.
+
+```js
+    const { CurrentTestRun, CurrentTest } = require("@zebrunner/javascript-agent-nightwatch");
+    const fs = require('fs');
+
+    module.exports = {
+
+        beforeEach(browser) {
+            CurrentTestRun.uploadArtifactFromFile("configuration", "./images/launcher_config.png");
+
+            const buffer = fs.readFileSync("./screens/fileName.png")
+            CurrentTestRun.uploadArtifactBuffer('artifact_image_name', 'image/png', buffer);
+
+            ZebrunnerReporterAPI.startTest(browser);
+
+            CurrentTest.uploadArtifactFromFile(browser, "readme", "./README.md");
+        },
+
+        afterEach(browser) {
+            ZebrunnerReporterAPI.finishTest(browser);
+        },
+
+        'first test': (browser) => {
+            CurrentTest.uploadArtifactFromFile(browser, "some useful screenshot", "./screens/fileName.png");
             // ...
         },
     };
