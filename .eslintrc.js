@@ -30,5 +30,6 @@ module.exports = {
       { blankLine: 'always', prev: '*', next: 'if' },
       { blankLine: 'always', prev: '*', next: 'break' },
     ],
+    'import/no-extraneous-dependencies': ['error', { dependencies: true }],
   },
 };

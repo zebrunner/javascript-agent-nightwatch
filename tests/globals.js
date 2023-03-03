@@ -16,10 +16,12 @@ module.exports = {
 
   beforeEach: (browser, done) => {
     ZebrunnerReporterAPI.startTestSession(browser);
+    // ZebrunnerReporterAPI.startTest(browser);
     done();
   },
 
   afterEach: (browser, done) => {
+    // ZebrunnerReporterAPI.finishTest(browser);
     ZebrunnerReporterAPI.finishTestSession(browser);
     done();
   },

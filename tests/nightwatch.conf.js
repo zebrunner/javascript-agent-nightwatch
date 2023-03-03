@@ -30,6 +30,15 @@ module.exports = {
         displayName: 'Nightwatch run',
         build: 'alpha-1',
         environment: 'Local',
+        locale: 'en_US',
+        treatSkipsAsFailures: false,
+        labels: {
+          runner: 'Alice',
+          reviewer: 'Bob',
+        },
+        artifactReferences: {
+          landing: 'https://zebrunner.com',
+        },
       },
       milestone: {
         id: 1,
