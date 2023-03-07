@@ -287,9 +287,10 @@ The following configuration options allow you to configure accompanying informat
 | `REPORTING_RUN_DISPLAY_NAME`<br/>`run.displayName` | Display name of the launch in Zebrunner. The default value is `Default Suite`.                                                          |
 | `REPORTING_RUN_BUILD`<br/>`run.build` | Build number associated with the launch. It can reflect either the test build number or the build number of the application under test. |
 | `REPORTING_RUN_ENVIRONMENT`<br/>`run.environment` | Represents the target environment in which the tests were run. For example, `stage` or `prod`. |
-| `REPORTING_LAUNCH_LOCALE`<br/>`launch.locale` | Locale that will be displayed for the automation launch in Zebrunner. For example,`en_US`. |
-| `<N/A>`<br/>`launch.labels` | Object with labels to be attached to the current launch. Property name is the label key, property value is the label value. Label value must be a string. |
-| `<N/A>`<br/>`launch.artifactReferences` | Object with artifact references to be attached to the current launch. Property name is the artifact reference name, property value is the artifact reference value. Value must be a string. |
+| `REPORTING_RUN_LOCALE`<br/>`run.locale` | Locale that will be displayed for the automation run in Zebrunner. For example,`en_US`. |
+| `REPORTING_RUN_TREAT_SKIPS_AS_FAILURES`<br/>`run.treatSkipsAsFailures` | If the value is set to `true`, skipped tests will be treated as failures when the result of the entire test run is calculated, otherwise skipped tests will be considered as passed. The default value is `true`. |
+| `<N/A>`<br/>`run.labels` | Object with labels to be attached to the current test run. Property name is the label key, property value is the label value. Label value must be a string. |
+| `<N/A>`<br/>`run.artifactReferences` | Object with artifact references to be attached to the current test run. Property name is the artifact reference name, property value is the artifact reference value. Value must be a string. |
 
 #### Milestone
 
@@ -297,19 +298,94 @@ Zebrunner Milestone for the automation launch can be configured using the follow
 
 | Env var / Reporter config                       | Description                                                                                                                                                                                                                         |
 |-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `REPORTING_MILESTONE_ID`<br/>`milestone.id`     | Id of the Zebrunner Milestone to link the automation launch to. The id is not displayed on Zebrunner UI, so the field is basically used for internal purposes. If the milestone does not exist, the launch will continue executing. |
-| `REPORTING_MILESTONE_NAME`<br/>`milestone.name` | Name of the Zebrunner Milestone to link the automation launch to. If the milestone does not exist, the appropriate warning message will be displayed in logs, but the test suite will continue executing.                           |
+| `REPORTING_MILESTONE_ID`<br/>`milestone.id`     | Id of the Zebrunner Milestone to link the automation test run to. The id is not displayed on Zebrunner UI, so the field is basically used for internal purposes. If the milestone does not exist, the run will continue executing. |
+| `REPORTING_MILESTONE_NAME`<br/>`milestone.name` | Name of the Zebrunner Milestone to link the automation test run to. If the milestone does not exist, the appropriate warning message will be displayed in logs, but the test suite will continue executing. |
 
 #### Notifications
 
 Zebrunner provides notification capabilities for automation launch results. The following options configure notification rules and targets.
 
-| Env var / Reporter config                                                               | Description                                                                                                                                                                                                                                                                                                                                                              |
+| Env var / Reporter config | Description |
 |-----------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `REPORTING_NOTIFICATION_NOTIFY_ON_EACH_FAILURE`<br/>`notifications.notifyOnEachFailure` | Specifies whether Zebrunner should send notifications to Slack/Teams on each test failure. The notifications will be sent even if the launch is still running. The default value is `false`.                                                                                                                                                                             |
+| `REPORTING_NOTIFICATION_NOTIFY_ON_EACH_FAILURE`<br/>`notifications.notifyOnEachFailure` | Specifies whether Zebrunner should send notifications to Slack/Teams on each test failure. The notifications will be sent even if the test run is still running. The default value is `false`. |
 | `REPORTING_NOTIFICATION_SLACK_CHANNELS`<br/>`notifications.slackChannels`               | A comma-separated list of Slack channels to send notifications to. Notifications will be sent only if the Slack integration is properly configured in Zebrunner with valid credentials for the project the launch is reported to. Zebrunner can send two types of notifications: on each test failure (if the appropriate property is enabled) and on the launch finish. |
 | `REPORTING_NOTIFICATION_MS_TEAMS_CHANNELS`<br/>`notifications.teamsChannels`            | A comma-separated list of Microsoft Teams channels to send notifications to. Notifications will be sent only if the Teams integration is configured in the Zebrunner project with valid webhooks for the channels. Zebrunner can send two types of notifications: on each test failure (if the appropriate property is enabled) and on the launch finish.                |
-| `REPORTING_NOTIFICATION_EMAILS`<br/>`notifications.emails`                              | A comma-separated list of emails to send notifications to. This type of notifications does not require further configuration on Zebrunner side. Unlike other notification mechanisms, Zebrunner can send emails only on the launch finish.                                                                                                                               |
+| `REPORTING_NOTIFICATION_EMAILS`<br/>`notifications.emails`                              | A comma-separated list of emails to send notifications to. This type of notifications does not require further configuration on Zebrunner side. Unlike other notification mechanisms, Zebrunner can send emails only on the launch finish. |
+
+
+#### Integration with Test Case Management systems
+
+Zebrunner integrates with different Test Case Management (TCM) systems and provides the following capabilities:
+
+1. Linking test cases to test executions
+2. Previewing linked test cases in Zebrunner
+3. Pushing test execution results to the TCM system
+
+This functionality is currently supported only for Zebrunner Test Case Management, TestRail, Xray, Zephyr Squad and Zephyr Scale.
+
+The link between execution of a test method and corresponding test cases can only be set from within the test method code. For more information about this, see the [Linking test cases to test executions](#linking-test-cases-to-test-executions) section.
+
+If you want to push the execution results to the TCM system, you need to provide additional configuration for the Agent. For all the supported TCMs, Zebrunner can push results to a pre-created test suite execution (this term has a different name in different systems). For TestRail, you can also create a new Test Run based on the Agent configuration and push the results into it. If enabled, the push can be performed either at the end of the whole test run, or in real time after each test.
+
+The following subsection covers how to provide configuration for pushing results to each of the TCM systems.
+
+##### Zebrunner Test Case Management (TCM)
+
+| Env var / Reporter config                                                      | Description |
+|--------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_ZEBRUNNER_PUSH_RESULTS`<br/>`tcm.zebrunner.pushResults`         | Boolean value which specifies if the execution results should be pushed to Zebrunner TCM. The default value is `false`. |
+| `REPORTING_TCM_ZEBRUNNER_PUSH_IN_REAL_TIME`<br/>`tcm.zebrunner.pushInRealTime` | Boolean value. Specifies whether to push execution results immediately after each test is finished (value `true`) or not (value `false`). The default value is `false`. |
+| `REPORTING_TCM_ZEBRUNNER_TEST_RUN_ID`<br/>`tcm.zebrunner.testRunId`            | Numeric id of the target Test Run in Zebrunner TCM. If a value is not provided, no new runs will be created.|
+
+##### TestRail
+
+| Env var / Reporter config                                                                      | Description |
+|------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_TESTRAIL_PUSH_RESULTS`<br/>`tcm.testRail.pushResults`                           | Boolean value which specifies if the execution results should be pushed to TestRail. The default value is `false`. |
+| `REPORTING_TCM_TESTRAIL_PUSH_IN_REAL_TIME`<br/>`tcm.testRail.pushInRealTime`                   | Boolean value. Specifies whether to push execution results immediately after each test is finished (value `true`) or not (value `false`). The default value is `false`. Enabling of this option forces the `includeAllTestCasesInNewRun` to be `true`. |
+| `REPORTING_TCM_TESTRAIL_SUITE_ID`<br/>`tcm.testRail.suiteId`                                   | Specifies the numeric id of the TestRail Suite in which the tests reside. TestRail displays the ids prefixed with 'S' letter. You need to provide the id without this letter.                                                                          |
+| `REPORTING_TCM_TESTRAIL_RUN_ID`<br/>`tcm.testRail.runId`                                       | The id of the TestRail Test Run in which the results should be pushed. TestRail displays the ids prefixed with 'R' letter. You need to provide the id without this letter.                                                                             |
+| `REPORTING_TCM_TESTRAIL_RUN_NAME`<br/>`tcm.testRail.runName`                                   | Specifies the name of a new Test Run in TestRail. If push is enabled and run id is not provided, Zebrunner will create a new run in TestRail. If the value is not provided, Zebrunner will use the run display name.                                |
+| `REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN`<br/>`tcm.testRail.includeAllTestCasesInNewRun` | If the value is set to `true`, all cases from the Suite will be added to the newly created Test Run. The value is forced to be `true` if real-time push is enabled. Default value is `false`.                                                          |
+| `REPORTING_TCM_TESTRAIL_MILESTONE_NAME`<br/>`tcm.testRail.milestoneName`                       | The newly created Test Run will be associated with the milestone specified using this property. |
+| `REPORTING_TCM_TESTRAIL_ASSIGNEE`<br/>`tcm.testRail.assignee`                                  | Assignee of the newly created Test Run. The value should be the email of an existing TestRail user. |
+
+##### Xray
+
+| Env var / Reporter config                                            | Description |
+|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_XRAY_PUSH_RESULTS`<br/>`tcm.xray.pushResults`         | Boolean value which specifies if the execution results should be pushed to Xray. The default value is `false`.                                                          |
+| `REPORTING_TCM_XRAY_PUSH_IN_REAL_TIME`<br/>`tcm.xray.pushInRealTime` | Boolean value. Specifies whether to push execution results immediately after each test is finished (value `true`) or not (value `false`). The default value is `false`. |
+| `REPORTING_TCM_XRAY_EXECUTION_KEY`<br/>`tcm.xray.executionKey`       | The key of the Xray Execution where the results should be pushed. |
+
+##### Zephyr
+
+| Env var / Reporter config                                                | Description |
+|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_ZEPHYR_PUSH_RESULTS`<br/>`tcm.zephyr.pushResults`         | Boolean value which specifies if the execution results should be pushed to Zephyr. The default value is `false`.                                                        |
+| `REPORTING_TCM_ZEPHYR_PUSH_IN_REAL_TIME`<br/>`tcm.zephyr.pushInRealTime` | Boolean value. Specifies whether to push execution results immediately after each test is finished (value `true`) or not (value `false`). The default value is `false`. |
+| `REPORTING_TCM_ZEPHYR_JIRA_PROJECT_KEY`<br/>`tcm.zephyr.jiraProjectKey`  | Specifies the key of the Jira project where the tests reside.                                                                                                           |
+| `REPORTING_TCM_ZEPHYR_TEST_CYCLE_KEY`<br/>`tcm.zephyr.testCycleKey`      | The key of the Zephyr Test Cycle where the results should be pushed.                                                                                                    |
+
+##### Custom Result Statuses
+
+By default, when the execution results are being pushed to a TCM system, Zebrunner maps each test execution result to an appropriate result status in the target TCM system. Most of the time this work perfectly, but in some cases Zebrunner is not able to derive the appropriate target result status. 
+
+One of the examples of such cases is when a test case result status does not correlate with the test execution status, or when you have conditional logic determining the actual result status for the test case. For such cases the Agent comes with a special method which sets a specific Result Status to the test case. For more information about this, see the [Linking test cases to test executions](#linking-test-cases-to-test-executions) section.
+
+Another example is custom Result Statuses in target TCM system. In this case we cannot anticipate the correct status and simply skip the test execution. In order to tackle this, Zebrunner allows you to configure default status for passed and failed test executions (for skipped tests this is not technically possible).
+
+| Env var / Reporter config                                                | Description |
+|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| `REPORTING_TCM_TEST_CASE_STATUS_ON_PASS`<br/>`tcm.testCaseStatus.onPass` | The default status that will be assigned to passed test executions when they are pushed to a TCM system. |
+| `REPORTING_TCM_TEST_CASE_STATUS_ON_FAIL`<br/>`tcm.testCaseStatus.onFail` | The default status that will be assigned to failed test executions when they are pushed to a TCM system. |
+
+When pushing results to a TCM system, Zebrunner derives the Result Status in the following order:
+
+1. Checks the explicitly assigned value (which was assigned using the `#testCaseStatus()` method).
+2. Takes the default status provided via configuration for passed and/or failed tests.
+3. Uses internal mapping of Zebrunner statuses to the Result Statuses of the target TCM system. 
+
 
 ### Examples
 
@@ -327,6 +403,7 @@ The following code snippet is a list of all configuration environment variables 
     REPORTING_RUN_BUILD=2.41.2.2431-SNAPSHOT
     REPORTING_RUN_ENVIRONMENT=QA
     REPORTING_RUN_LOCALE=en_US
+    REPORTING_RUN_TREAT_SKIPS_AS_FAILURES=true
 
     REPORTING_MILESTONE_ID=1
     REPORTING_MILESTONE_NAME=Release 1.0.0
@@ -335,6 +412,31 @@ The following code snippet is a list of all configuration environment variables 
     REPORTING_NOTIFICATION_SLACK_CHANNELS=dev, qa
     REPORTING_NOTIFICATION_MS_TEAMS_CHANNELS=dev-channel, management
     REPORTING_NOTIFICATION_EMAILS=manager@mycompany.com
+
+    REPORTING_TCM_TEST_CASE_STATUS_ON_PASS=PASS
+    REPORTING_TCM_TEST_CASE_STATUS_ON_FAIL=FAIL
+
+    REPORTING_TCM_ZEBRUNNER_PUSH_RESULTS=false
+    REPORTING_TCM_ZEBRUNNER_PUSH_IN_REAL_TIME=true
+    REPORTING_TCM_ZEBRUNNER_TEST_RUN_ID=17
+
+    REPORTING_TCM_TESTRAIL_PUSH_RESULTS=false
+    REPORTING_TCM_TESTRAIL_PUSH_IN_REAL_TIME=true
+    REPORTING_TCM_TESTRAIL_SUITE_ID=100
+    REPORTING_TCM_TESTRAIL_RUN_ID=500
+    REPORTING_TCM_TESTRAIL_INCLUDE_ALL_IN_NEW_RUN=true
+    REPORTING_TCM_TESTRAIL_RUN_NAME=Nightwatch Run
+    REPORTING_TCM_TESTRAIL_MILESTONE_NAME=Nightwatch Milestone
+    REPORTING_TCM_TESTRAIL_ASSIGNEE=tester@mycompany.com
+
+    REPORTING_TCM_XRAY_PUSH_RESULTS=false
+    REPORTING_TCM_XRAY_PUSH_IN_REAL_TIME=true
+    REPORTING_TCM_XRAY_EXECUTION_KEY=QT-100
+
+    REPORTING_TCM_ZEPHYR_PUSH_RESULTS=false
+    REPORTING_TCM_ZEPHYR_PUSH_IN_REAL_TIME=true
+    REPORTING_TCM_ZEPHYR_JIRA_PROJECT_KEY=ZEB
+    REPORTING_TCM_ZEPHYR_TEST_CYCLE_KEY=ZEB-T1
 
    ```
 
@@ -357,6 +459,7 @@ Here you can see an example of the full configuration provided via `nightwatch.c
                 build: '2.41.2.2431-SNAPSHOT',
                 environment: 'QA',
                 locale: 'en_US',
+                treatSkipsAsFailures: true,
                 labels: {
                     runner: 'Alice',
                     reviewer: 'Bob',
@@ -374,6 +477,38 @@ Here you can see an example of the full configuration provided via `nightwatch.c
                 slackChannels: 'dev, qa',
                 teamsChannels: 'dev-channel, management',
                 emails: 'manager@mycompany.com',
+            },
+            tcm: {
+                testCaseStatus: {
+                    onPass: 'PASS',
+                    onFail: 'FAIL',
+                },
+                zebrunner: {
+                    pushResults: false,
+                    pushInRealTime: true,
+                    testRunId: 17,
+                },
+                testRail: {
+                    pushResults: false,
+                    pushInRealTime: true,
+                    suiteId: 100,
+                    runId: 500,
+                    includeAllTestCasesInNewRun: true,
+                    runName: 'Nightwatch Run',
+                    milestoneName: 'Nightwatch Milestone',
+                    assignee: 'tester@mycompany.com',
+                },
+                xray: {
+                    pushResults: false,
+                    pushInRealTime: true,
+                    executionKey: 'QT-100',
+                },
+                zephyr: {
+                    pushResults: false,
+                    pushInRealTime: true,
+                    jiraProjectKey: 'ZEB',
+                    testCycleKey: 'ZEB-T1',
+                },
             },
         }
     }
@@ -652,3 +787,166 @@ Zebrunner Agent comes with a convenient method `#revertRegistration()` of the `C
 ```
 
 It is worth mentioning that the method invocation does not affect the test execution, but simply unregisters the test in Zebrunner. To interrupt the test execution, you need to do additional actions, for example, throw an Error.
+
+## Linking test cases to test executions
+
+Note: to learn more about pushing results to a TCM system, see the [Integration with Test Case Management systems](#integration-with-test-case-management-systems) section.
+
+### Zebrunner TCM
+
+The Agent comes with the `Zebrunner` object which contains methods to link test cases to a currently executing test: 
+
+- `#testCaseKey(browser, ...testCaseKeys)` - accepts a list of test cases which should be linked to the current test;
+- `#testCaseStatus(browser, testCaseKey, resultStatus)` - links one test case and provides\overrides its result status. This may be useful if the test case result status does not correlate with the test execution status, or if you have conditional logic determining the actual result status for the test case.
+
+If these methods are invoked for the same test case id many times within a test method, the last invocation will take precedence. For example, if you invoke the `#testCaseStatus(browser, 'KEY-1', 'SKIPPED')` first, and then invoke the `#testCaseKey(browser, 'KEY-1')`, then the result status you provided in the first invocation will be ignored.
+
+```js
+    const { Zebrunner } = require("@zebrunner/javascript-agent-nightwatch");
+
+    module.exports = {
+
+        beforeEach(browser) {
+            ZebrunnerReporterAPI.startTest(browser);
+        },
+
+        afterEach(browser) {
+            ZebrunnerReporterAPI.finishTest(browser);
+        },
+
+        'first test': (browser) => {
+            Zebrunner.testCaseKey(browser, 'KEY-100', 'KEY-200');
+            // ...
+        },
+
+        'second test': (browser) => {
+            Zebrunner.testCaseKey(browser, 'KEY-300', 'KEY-400');
+            // ...
+            if (someCondition) {
+                // overriddes the status of the test case when results are pushed to the Zebrunner TCM.
+                // using this method, you can manually specify the desired result status. 
+                Zebrunner.testCaseStatus(browser, 'KEY-300', 'SKIPPED');
+            }
+        },
+    };
+```
+
+### Testrail
+
+The Agent comes with the `TestRail` object which contains methods to link test cases to a currently executing test: 
+
+- `#testCaseId(browser, ...testCaseIds)` - accepts a list of test cases which should be linked to current test;
+- `#testCaseStatus(browser, testCaseId, resultStatus)` - links one test case and provides\overrides its result status. This may be useful if the test case result status does not correlate with the test execution status, or if you have conditional logic determining the actual result status for the test case.
+
+If these methods are invoked for the same test case id many times within a test method, the last invocation will take precedence. For example, if you invoke the `#testCaseStatus(browser, 'C1', 'SKIPPED')` first and then invoke the `#testCaseId(browser, 'C1')`, then the result status you provided in first invocation will be ignored.
+
+```js
+    const { TestRail } = require("@zebrunner/javascript-agent-nightwatch");
+
+    module.exports = {
+
+        beforeEach(browser) {
+            ZebrunnerReporterAPI.startTest(browser);
+        },
+
+        afterEach(browser) {
+            ZebrunnerReporterAPI.finishTest(browser);
+        },
+
+        'first test': (browser) => {
+            TestRail.testCaseId(browser, '1000', 'C2000');
+            // ...
+        },
+
+        'second test': (browser) => {
+            TestRail.testCaseId(browser, '3000', '4000');
+            // ...
+            if (someCondition) {
+                // overriddes the status of the test case when results are pushed to the TestRail.
+                // by default Zebrunner maps the test execution result to a result status from TestRail.
+                // using this method, you can manually specify the desired result status. 
+                TestRail.testCaseStatus(browser, '3000', 'SKIPPED');
+            }
+        },
+    };
+```
+
+### Xray
+
+The Agent comes with the `Xray` object which contains methods to link test cases to a currently executing test:
+
+- `#testCaseKey(browser, ...testCaseKeys)` - accepts a list of test cases which should be linked to current test;
+- `#testCaseStatus(browser, testCaseKey, resultStatus)` - links one test case and provides\overrides its result status. This may be useful if the test case result status does not correlate with the test execution status, or if you have conditional logic determining the actual result status for the test case.
+
+If these methods are invoked for the same test case id many times within a test method, the last invocation will take precedence. For example, if you invoke the `#testCaseStatus(browser, 'KEY-1', 'SKIPPED')` first, and then invoke the `#testCaseKey(browser, 'KEY-1')`, then the result status you provided in first invocation will be ignored.
+
+```js
+    const { Xray } = require("@zebrunner/javascript-agent-nightwatch");
+
+    module.exports = {
+
+        beforeEach(browser) {
+            ZebrunnerReporterAPI.startTest(browser);
+        },
+
+        afterEach(browser) {
+            ZebrunnerReporterAPI.finishTest(browser);
+        },
+
+        'first test': (browser) => {
+            Xray.testCaseKey(browser, 'QT-100');
+            // ...
+        },
+
+        'second test': (browser) => {
+            Xray.testCaseKey(browser, 'QT-200', 'QT-300');
+            // ...
+            if (someCondition) {
+                // overriddes the status of the test case when results are pushed to the Xray.
+                // by default Zebrunner maps the test execution result to a result status from Xray.
+                // using this method, you can manually specify the desired result status. 
+                Xray.testCaseStatus(browser, 'QT-200', 'SKIPPED');
+            }
+        },
+    };
+```
+
+### Zephyr
+
+The Agent comes with the `Zephyr` object which contains methods to link test cases to currently executing test:
+
+- `#testCaseKey(browser, ...testCaseKeys)` - accepts a list of test cases which should be linked to current test;
+- `#testCaseStatus(browser, testCaseKey, resultStatus)` - links one test case and provides\overrides its result status. This may be useful if the test case result status does not correlate with the test execution status, or if you have conditional logic determining the actual result status for the test case.
+
+If these methods are invoked for the same test case id many times within a test method, the last invocation will take precedence. For example, if you invoke the `#testCaseStatus(browser, 'KEY-1', 'SKIPPED')` first, and then invoke the `#testCaseKey(browser, 'KEY-1')`, then the result status you provided in first invocation will be ignored.
+
+```js
+    const { Zephyr } = require("@zebrunner/javascript-agent-nightwatch");
+
+    module.exports = {
+
+        beforeEach(browser) {
+            ZebrunnerReporterAPI.startTest(browser);
+        },
+
+        afterEach(browser) {
+            ZebrunnerReporterAPI.finishTest(browser);
+        },
+
+        'first test': (browser) => {
+            Zephyr.testCaseKey(browser, 'QT-T1');
+            // ...
+        },
+
+        'second test': (browser) => {
+            Zephyr.testCaseKey(browser, 'QT-T1', 'QT-T2');
+            // ...
+            if (someCondition) {
+                // overriddes the status of the test case when results are pushed to the Zephyr.
+                // by default Zebrunner maps the test execution result to a result status from Zephyr.
+                // using this method, you can manually specify the desired result status. 
+                Zephyr.testCaseStatus(browser, 'QT-T1', 'SKIPPED');
+            }
+        },
+    };
+```

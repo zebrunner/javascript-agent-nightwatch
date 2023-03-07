@@ -3,6 +3,9 @@ const ZebrunnerReporterAPI = require('./lib/nightwatch/realTimeReporter/reporter
 const ZebrunnerConfigurator = require('./lib/launcher-configurator');
 const CurrentTestRun = require('./lib/nightwatch/realTimeReporter/current-test-run');
 const CurrentTest = require('./lib/nightwatch/realTimeReporter/current-test');
+const {
+  Zebrunner, TestRail, Xray, Zephyr,
+} = require('./lib/nightwatch/realTimeReporter/tcm');
 
 module.exports = {
   ZebrunnerReporter,
@@ -10,4 +13,8 @@ module.exports = {
   ZebrunnerConfigurator,
   CurrentTestRun,
   CurrentTest,
+  Zebrunner,
+  TestRail,
+  Xray,
+  Zephyr,
 };
