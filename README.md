@@ -505,7 +505,7 @@ Below you can see an example of the full configuration provided via `nightwatch.
 ## Launcher configuration
 Zebrunner Launcher provides a great way to execute tests without having to worry about the runtime environment.
 
-> To learn more about the Zebrunner Launcher and all it's capabilities, refer to the [Zebrunner Launcher](../../guide/launchers/) documentation page.
+> To learn more about the Zebrunner Launcher and all it's capabilities, refer to the [Zebrunner Launcher](https://zebrunner.com/documentation/guide/launchers/) documentation page.
 
 The Nightwatch Agent is fully integrated with the Zebrunner Launcher and requires even less configuration when used with it. The Zebrunner Launcher automatically provides `REPORTING_ENABLED`, `REPORTING_PROJECT_KEY`, `REPORTING_SERVER_HOSTNAME`, `REPORTING_SERVER_ACCESS_TOKEN` and some other environment variables, so there is no need to explicitly specify them or the corresponding `nightwatch.conf.js` file properties.
 
@@ -523,9 +523,7 @@ Configuration of the Launcher for Nightwatch tests is pretty straightforward:
 7. Select a configured Testing Platform (e.g. Zebrunner Selenium Grid) along with operating system and/or desired browser/device. More information about how the selected Testing Platform and capabilities are processed can be found in the next subsection.
 8. If the launcher is configured, hit the **Add** button at the bottom of the page.
 
-<figure markdown>
-  ![Launcher Configuration](001-launcher-configuration.png){ width="1000" }
-</figure>
+![Example of launcher configuration](./images/launcher_config.png).
 
 Now you can launch the tests using Zebrunner Launcher. To do this, click the **Launch** button which is located under the configuration of the selected launcher.
 
@@ -603,9 +601,9 @@ Possible values:  "ZEBRUNNER" | "BROWSERSTACK" | "LAMBDATEST" | "SAUCELABS" | "T
 
 ## Collecting screenshots
 
-The Zebrunner Agent allows you to automatically and manually take screenshots and send them into Zebrunner Reporting.
+The Zebrunner Agent allows you to take screenshots both  automatically and manually, and send them into Zebrunner Reporting.
 
-Automatic screenshot capturing is possible after test failures so make sure you've enabled them in the `nightwatch.conf.js` configuration file:
+Automatic screenshot capturing is possible after a test fails, so make sure you've enabled it in the `nightwatch.conf.js` configuration file:
 
 ```js title="nightwatch.conf.js"
     module.exports = {
@@ -645,9 +643,9 @@ Manually taken screenshots can be sent to Zebrunner using the `#saveScreenshot(b
     };
 ```
 
-Nightwatch allows to create custom commands that is very convenient to use in chaining. 
-For example, 
-1. Create a file `commands/takeScreenshot.js` with following code snippet:
+In addition, Nightwatch provides the possibility to create custom commands, which can be much useful in chaining. For example:
+ 
+1. Create a file `commands/takeScreenshot.js` with the following code snippet:
 
 ```js
     const { CurrentTest } = require("@zebrunner/javascript-agent-nightwatch");
@@ -661,8 +659,8 @@ For example,
     };
 ```
 
-2. Specify the path to `commands` folder in the `nightwatch.conf.json` file for the `custom_commands_path` property.
-3. Use created command in the tests:
+2. Specify the path to the `commands` folder in the `nightwatch.conf.json` file for the `custom_commands_path` property.
+3. Use the newly created command in the tests:
 
 ```js
     const { CurrentTest } = require("@zebrunner/javascript-agent-nightwatch");
@@ -856,9 +854,7 @@ It is worth mentioning that the method invocation does not affect the test execu
 
 ## Linking test cases to test executions
 
-!!! note
-
-    To learn more about pushing results to a TCM system, see the [Integration with Test Case Management systems](#integration-with-test-case-management-systems) section.
+> To learn more about pushing results to a TCM system, see the [Integration with Test Case Management systems](#integration-with-test-case-management-systems) section.
 
 ### Zebrunner TCM
 
