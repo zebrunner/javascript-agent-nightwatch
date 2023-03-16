@@ -1,14 +1,19 @@
 const fs = require('fs');
 const {
-  ZebrunnerReporterAPI, CurrentTestRun, CurrentTest, TestRail, Xray, Zephyr, Zebrunner,
+  ZebrunnerReporterAPI,
+  CurrentLaunch,
+  CurrentTest,
+  TestRail,
+  Xray,
+  Zephyr,
+  Zebrunner,
 } = require('../..');
 
 module.exports = {
-
   beforeEach(browser) {
-    CurrentTestRun.attachLabel('run_before_label', 'first', 'one more', '', null);
-    CurrentTestRun.attachArtifactReference('documentation', 'https://zebrunner.com/documentation/');
-    CurrentTestRun.uploadArtifactFromFile('configuration', './images/launcher_config.png');
+    CurrentLaunch.attachLabel('run_before_label', 'first', 'one more', '', null);
+    CurrentLaunch.attachArtifactReference('documentation', 'https://zebrunner.com/documentation/');
+    CurrentLaunch.uploadArtifactFromFile('configuration', './images/launcher_config.png');
 
     ZebrunnerReporterAPI.startTest(browser);
 
@@ -43,11 +48,16 @@ module.exports = {
     CurrentTest.setMaintainer(browser, 'asukhodolova');
     CurrentTest.uploadArtifactFromFile(browser, 'index', './index.js');
 
+    CurrentTest.saveScreenshot(browser);
+
     browser
       .url('https://www.ecosia.org')
       .waitForElementVisible('body')
+      .takeScreenshot()
       .assert.titleContains('Ecosia')
+      .takeScreenshot()
       .assert.visible('input[type=search]')
+      .takeScreenshot()
       .setValue('input[type=search]', 'nightwatch')
       .assert.visible('button[type=submit]');
   },
@@ -63,6 +73,7 @@ module.exports = {
 
     browser
       .click('button[type=submit]')
+      .takeScreenshot()
       .assert.textContains('.layout__content', 'Nightwsssssatch.js');
   },
 

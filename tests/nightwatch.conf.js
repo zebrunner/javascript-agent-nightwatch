@@ -3,7 +3,7 @@ const { ZebrunnerConfigurator } = require('..');
 module.exports = {
   src_folders: ['specs'],
   page_objects_path: [],
-  custom_commands_path: [],
+  custom_commands_path: ['tests/commands'],
   custom_assertions_path: [],
   plugins: [],
   globals_path: 'globals.js',
@@ -26,7 +26,7 @@ module.exports = {
         hostname: 'https://solvdinternal.zebrunner.com/',
         accessToken: 'CAve1wEDfcbfWuhMdtoPHAaDdaMCOyaUUR7ykFRvi7YwipX6Ee',
       },
-      run: {
+      launch: {
         displayName: 'Nightwatch run',
         build: 'alpha-1',
         environment: 'Local',
@@ -113,12 +113,9 @@ module.exports = {
 
     zebrunner: ZebrunnerConfigurator.configureLauncher({
       selenium: {
-        start_process: false,
-        server_path: '',
         host: 'localhost',
         port: 4444,
       },
-
       username: 'username',
       access_key: 'access_key',
 
@@ -127,36 +124,8 @@ module.exports = {
       },
       desiredCapabilities: {
         browserName: 'chrome',
-        'goog:chromeOptions': {
-          w3c: true,
-        },
         'zebrunner:provider': 'ZEBRUNNER',
       },
     }),
-
-    mocha_tests: {
-      test_runner: {
-        type: 'mocha',
-        options: {
-          ui: 'bdd',
-          reporter: '../index.js',
-          reporterOptions: {
-            zebrunnerConfig: {
-              enabled: true,
-              projectKey: 'ANNAS',
-              server: {
-                hostname: 'https://solvdinternal.zebrunner.com/',
-                accessToken: 'CAve1wEDfcbfWuhMdtoPHAaDdaMCOyaUUR7ykFRvi7YwipX6Ee',
-              },
-              run: {
-                displayName: 'Nightwatch run',
-                build: 'alpha-1',
-                environment: 'Local',
-              },
-            },
-          },
-        },
-      },
-    },
   },
 };
