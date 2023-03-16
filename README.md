@@ -132,7 +132,7 @@ a. To track *each test from a file as a separate test in Zebrunner*, use `before
     };
 ```
 
-b. Sometimes it may be useful to track *all tests from a file as one test in Zebrunner*, e.g., when the tests are written in `module.exports` style and each test mostly represents a step within the test file. In this case, use `before` and `after` hooks to start and finish a Zebrunner test. `#startTest` method accepts an optional argument as the second parameter where you can define a custom name of the test. If the argument is missing, the agent will use the test file name.
+b. Sometimes it may be useful to track *all test methods from a file as one test in Zebrunner*, e.g., when the tests are written in `module.exports` style and each method effectively represents a test step. In this case, use `before` and `after` hooks to start and finish a Zebrunner test. The `#startTest` method accepts an optional second argument using which you can define a custom name of the test. If the argument is missing, the agent will use the test file name.
 
 - Bdd syntax:
 ```js
@@ -168,7 +168,9 @@ b. Sometimes it may be useful to track *all tests from a file as one test in Zeb
     };
 ```
 
-c. There is one more option that allows to make configuration for all tests from the project *without* updating every test file. In this case, *all tests from a file will be tracked as one test in Zebrunner*. This will require updating only `beforeEach` and `afterEach` hooks from the 'globals' file `lib/globals.js`. Using this configuration, logs and screenshots of the test will be displayed in Zebrunner after the whole test file is completed.
+c. There is one more option that allows you to report *all tests from a file as one test in Zebrunner*, but *without* the need to update all test files. This requires only updating the `beforeEach` and `afterEach` global hooks (by default, they are in `lib/globals.js` file). Using this configuration, logs and screenshots of every test will be displayed in Zebrunner only after the test file is completed.
+
+> This configuration will be applied to *all* test files, so if you need to report test files in different ways within the same launch, this option is not suitable.
 
 ```js title="globals.js"
     const { ZebrunnerReporter, ZebrunnerReporterAPI } = require('@zebrunner/javascript-agent-nightwatch');
@@ -523,7 +525,7 @@ Configuration of the Launcher for Nightwatch tests is pretty straightforward:
 7. Select a configured Testing Platform (e.g. Zebrunner Selenium Grid) along with operating system and/or desired browser/device. More information about how the selected Testing Platform and capabilities are processed can be found in the next subsection.
 8. If the launcher is configured, hit the **Add** button at the bottom of the page.
 
-![Example of launcher configuration](./images/launcher_config.png).
+![Example of launcher configuration](./images/launcher_config.png)
 
 Now you can launch the tests using Zebrunner Launcher. To do this, click the **Launch** button which is located under the configuration of the selected launcher.
 
@@ -531,9 +533,9 @@ If something went wrong while running the tests, you can examine the logs captur
 
 ### Testing platform and capabilities
 
-The Zebrunner Agent will automatically substitute the Selenium server and capabilities configurations with the values selected in the **Testing platform** section of Zebrunner Launcher. For example, if you select **Zebrunner Selenium Grid** as a testing platform and select the `Linux` platform and `Chrome 105.0` browser, the Zebrunner Agent will apply the following configuration in your `nightwatch.conf.js` file.
+The Zebrunner Agent will substitute the Selenium server and capabilities configurations with the values selected in the **Testing platform** section of Zebrunner Launcher. For example, if you select **Zebrunner Selenium Grid** as a testing platform and select the `Linux` platform and `Chrome 105.0` browser, the Zebrunner Agent will apply the selected configuration in your `nightwatch.conf.js` file.
 
-It is only necessary to import `ZebrunnerConfigurator` and wrap Selenium Grid configuration as an argument for `ZebrunnerConfigurator.configureLauncher` function.
+It is only necessary to import `ZebrunnerConfigurator` and wrap Selenium Grid configuration as an argument for `ZebrunnerConfigurator.configureLauncher` function. If the tests will be executed using Zebrunner Launcher, this method will configure everything what you need, otherwise the original configuration will be returned.
 
 The example below shows a newly defined environment `zebrunner` with wrapped configuration, but you can update the existing one in a similar way.
 
@@ -550,18 +552,20 @@ The example below shows a newly defined environment `zebrunner` with wrapped con
             // `zebrunner` environment
             zebrunner: ZebrunnerConfigurator.configureLauncher({
                 selenium: {
-                    host: 'localhost',
-                    port: 4444,
+                    host: 'engine.zebrunner.com',
+                    port: 443,
                 },
 
-                username: 'username',
-                access_key: 'access_key',
+                username: '<username>',
+                access_key: '<access_key>',
 
                 webdriver: {
                     start_process: false,
                 },
                 desiredCapabilities: {
+                    platformName: 'linux',
                     browserName: 'chrome',
+                    browserVersion: '105.0',
                     "zebrunner:provider": "ZEBRUNNER"
                 },
             }),

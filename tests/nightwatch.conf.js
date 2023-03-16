@@ -113,17 +113,19 @@ module.exports = {
 
     zebrunner: ZebrunnerConfigurator.configureLauncher({
       selenium: {
-        host: 'localhost',
-        port: 4444,
+        host: 'engine.zebrunner.com',
+        port: 443,
       },
-      username: 'username',
-      access_key: 'access_key',
+      username: 'solvdinternal',
+      access_key: 'O9JjPcqxJ0hPs685',
 
       webdriver: {
         start_process: false,
       },
       desiredCapabilities: {
+        platformName: 'linux',
         browserName: 'chrome',
+        browserVersion: '105.0',
         'zebrunner:provider': 'ZEBRUNNER',
       },
     }),
