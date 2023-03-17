@@ -116,8 +116,8 @@ module.exports = {
         host: 'engine.zebrunner.com',
         port: 443,
       },
-      username: 'solvdinternal',
-      access_key: 'O9JjPcqxJ0hPs685',
+      username: '<username>',
+      access_key: '<access_key>',
 
       webdriver: {
         start_process: false,
