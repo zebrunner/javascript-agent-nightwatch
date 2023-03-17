@@ -7,11 +7,11 @@ module.exports = {
 
   before: async () => {
     zbrReporter = new ZebrunnerReporter(config);
-    await zbrReporter.startTestRun();
+    await zbrReporter.startLaunch();
   },
 
   after: async () => {
-    await zbrReporter.finishTestRun();
+    await zbrReporter.finishLaunch();
   },
 
   beforeEach: (browser, done) => {
