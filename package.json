@@ -1,6 +1,6 @@
 {
   "name": "@zebrunner/javascript-agent-nightwatch",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Zebrunner Agent: Nightwatch reporting integration",
   "main": "index.js",
   "directories": {
